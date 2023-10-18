@@ -1,0 +1,148 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.*;
+
+class Student {
+    private String name;
+    private int rollNumber;
+    private String grade;
+
+    public Student(String name, int rollNumber, String grade) {
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.grade = grade;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRollNumber() {
+        return rollNumber;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+}
+
+class StudentManagementSystem {
+    private ArrayList<Student> students;
+
+    public StudentManagementSystem() {
+        students = new ArrayList<Student>();
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public void removeStudent(Student student) {
+        students.remove(student);
+    }
+
+    public Student searchStudent(int rollNumber) {
+        for (Student student : students) {
+            if (student.getRollNumber() == rollNumber) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public void displayAllStudents() {
+        for (Student student : students) {
+            System.out.println("Name: " + student.getName());
+            System.out.println("Roll Number: " + student.getRollNumber());
+            System.out.println("Grade: " + student.getGrade());
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        StudentManagementSystem system = new StudentManagementSystem();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Enter 1 to add a student");
+            System.out.println("Enter 2 to remove a student");
+            System.out.println("Enter 3 to search for a student");
+            System.out.println("Enter 4 to display all students");
+            System.out.println("Enter 5 to exit");
+
+            int choice = scanner.nextInt();
+
+            if (choice == 1) {
+                System.out.print("Enter name: ");
+                String name = scanner.next();
+
+                System.out.print("Enter roll number: ");
+                int rollNumber = scanner.nextInt();
+
+                System.out.print("Enter grade: ");
+                String grade = scanner.next();
+
+                system.addStudent(new Student(name, rollNumber, grade));
+                System.out.println("Student added successfully!");
+            } else if (choice == 2) {
+                System.out.print("Enter roll number of the student to remove: ");
+                int rollNumber = scanner.nextInt();
+
+                Student studentToRemove = system.searchStudent(rollNumber);
+
+                if (studentToRemove != null) {
+                    system.removeStudent(studentToRemove);
+                    System.out.println("Student removed successfully!");
+                } else {
+                    System.out.println("No such student found!");
+                }
+            } else if (choice == 3) {
+                System.out.print("Enter roll number of the student to search: ");
+                int rollNumber = scanner.nextInt();
+
+                Student searchedStudent = system.searchStudent(rollNumber);
+
+                if (searchedStudent != null) {
+                    System.out.println("Name: " + searchedStudent.getName());
+                    System.out.println("Roll Number: " + searchedStudent.getRollNumber());
+                    System.out.println("Grade: " + searchedStudent.getGrade());
+                    System.out.println();
+                } else {
+                    System.out.println("No such student found!");
+                }
+            } else if (choice == 4) {
+                system.displayAllStudents();
+            } else if (choice == 5) {
+                break;
+            } else {
+                System.out.println("Invalid choice!");
+            }
+        }
+        
+        // Write data to file
+        FileWriter writer = new FileWriter(new File("students.txt"));
+        
+        for (Student student : system.students) {
+            writer.write(student.getName() + "," + student.getRollNumber() + "," + student.getGrade() + "\n");
+        }
+        
+        writer.close();
+        
+        // Read data from file
+        BufferedReader reader = new BufferedReader(new FileReader(new File("students.txt")));
+        
+        String line;
+        
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            
+            String name = parts[0];
+            int rollNumber = Integer.parseInt(parts[1]);
+            String grade = parts[2];
+            
+            system.addStudent(new Student(name, rollNumber, grade));
+        }
+        
+        reader.close();
+    }
+}
